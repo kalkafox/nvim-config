@@ -31,12 +31,7 @@ require('packer').startup(function(use)
     end,
   })
 
-  use({
-    'norcalli/nvim-colorizer.lua',
-    config = function()
-      require('colorizer').setup()
-    end,
-  })
+  use('norcalli/nvim-colorizer.lua')
 
   use({ -- Additional text objects via treesitter
     'nvim-treesitter/nvim-treesitter-textobjects',
@@ -86,9 +81,6 @@ require('packer').startup(function(use)
   use({
     'folke/trouble.nvim',
     requires = 'nvim-tree/nvim-web-devicons',
-    config = function()
-      require('trouble').setup()
-    end,
   })
 
   -- File explorer plugin

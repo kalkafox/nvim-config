@@ -294,3 +294,10 @@ cmp.setup({
     { name = 'luasnip' },
   },
 })
+
+-- Trouble setup
+require('trouble').setup()
+
+-- Colorizer setup
+require('colorizer').setup()
+

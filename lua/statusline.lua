@@ -285,17 +285,17 @@ end
 local function get_temperature_color(temp)
   local temp = tonumber(temp)
   if temp < 50 then
-    return T.cyan
+    return darken(T.cyan, 20)
   elseif temp < 60 then
-    return T.blue
+    return darken(T.blue, 20)
   elseif temp < 70 then
-    return T.green
+    return darken(T.green, 20)
   elseif temp < 80 then
-    return T.yellow
+    return darken(T.yellow, 20)
   elseif temp < 90 then
-    return T.orange
+    return darken(T.orange, 20)
   else
-    return T.red
+    return darken(T.red, 20)
   end
 end
 
