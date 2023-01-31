@@ -353,6 +353,20 @@ function get_git_branch()
   return branch ~= '' and '' .. branch .. ' ' or ''
 end
 
+function get_os()
+  -- add support for macos, linux and windows
+  local os = vim.loop.os_uname().sysname:lower()
+  if os:find('darwin') then
+    return ' '
+  elseif os:find('linux') then
+    return ' '
+  elseif os:find('windows') then
+    return ' '
+  else
+    return ' '
+  end
+end
+
 --- wrap a string with whitespaces
 function wrap(string)
   return ' ' .. string .. ' '
@@ -439,6 +453,10 @@ end
 
 function provide_git_branch(component, opts)
   return get_git_branch()
+end
+
+function provide_operating_system(component, opts)
+  return get_os()
 end
 
 --
@@ -595,6 +613,19 @@ table.insert(components.active[RIGHT], {
   hl = function()
     return {
       bg = darken(T[vi_mode.get_mode_color()], 100),
+      fg = 'white',
+    }
+  end,
+})
+
+register_component(R, {
+  name = 'operating_system',
+  provider = provide_operating_system,
+  left_sep = 'left_rounded',
+  right_sep = ' ',
+  hl = function()
+    return {
+      bg = darken(T[vi_mode.get_mode_color()], 60),
       fg = 'white',
     }
   end,

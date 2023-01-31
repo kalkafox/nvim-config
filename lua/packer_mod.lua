@@ -1,5 +1,7 @@
 local is_windows = vim.loop.os_uname().sysname:find('Windows') ~= nil
 
+vim.o.termguicolors = true
+
 require('packer').startup(function(use)
   -- Package manager
   use('wbthomason/packer.nvim')
