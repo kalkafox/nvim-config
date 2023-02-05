@@ -260,26 +260,42 @@ function get_line_total()
   return vim.api.nvim_buf_line_count(0)
 end
 
-local function convert_string_to_unicode(string)
+local function is_daytime()
+  local hour = tonumber(os.date('%H'))
+  local sunrise = WEATHER_DATA.sys.sunrise
+  local sunset = WEATHER_DATA.sys.sunset
+  return hour >= sunrise and hour < sunset
+end
+
+local function convert_string_to_unicode(str)
   -- format is "04n"
-  local icon = string.sub(string, 1, 2)
+  local icon = str:sub(1, 2)
+  local icon_suffix = str:sub(3, 4)
   local icon_map = {
-    ['01'] = '',
-    ['02'] = '',
-    ['03'] = '',
-    ['04'] = '',
-    ['09'] = '',
-    ['10'] = '',
-    ['11'] = '',
-    ['13'] = '',
-    ['50'] = '',
-    ['09'] = '',
-    ['10'] = '',
-    ['11'] = '',
-    ['13'] = '',
-    ['50'] = '',
+    n = {
+      ['01'] = '',
+      ['02'] = '',
+      ['03'] = '',
+      ['04'] = '',
+      ['09'] = '',
+      ['10'] = '',
+      ['11'] = '',
+      ['13'] = '',
+      ['50'] = '',
+    },
+    d = {
+      ['01'] = '',
+      ['02'] = '',
+      ['03'] = '',
+      ['04'] = '',
+      ['09'] = '',
+      ['10'] = '',
+      ['11'] = '',
+      ['13'] = '',
+      ['50'] = '',
+    },
   }
-  return icon_map[icon]
+  return icon_map[icon_suffix][icon]
 end
 
 local function get_temperature_color(temp)
@@ -299,44 +315,78 @@ local function get_temperature_color(temp)
   end
 end
 
--- get weather info (is localized in weather_data global)
+-- get weather info (is localized in WEATHER_DATA global)
 function get_weather()
-  local weather = weather_data
+  local weather = WEATHER_DATA
   if weather == nil then
     return ''
   end
 
   local icon = convert_string_to_unicode(weather.weather[1].icon)
 
+  if icon:sub(1, 2) == '01' and not is_daytime() and tonumber(WEATHER_DATA.moon_phase) then
+    local moon_phase = tonumber(WEATHER_DATA.moon_phase)
+    -- range is 0 to 29.5
+    if moon_phase == 0 then
+      icon = '󰽤'
+    elseif moon_phase == 1 then
+      icon = '󰽥'
+    elseif moon_phase == 2 then
+      icon = ''
+    elseif moon_phase == 3 then
+      icon = '󰽦'
+    elseif moon_phase == 4 then
+      icon = '󰽢'
+    elseif moon_phase == 5 then
+      icon = '󰽨'
+    elseif moon_phase == 6 then
+      icon = '󰽧'
+    elseif moon_phase == 7 then
+      icon = ''
+    end
+  end
+
   local temp = weather.main.temp
 
   return icon .. '  ' .. temp .. '°F '
 end
 
+function has_diff_added()
+  return git.git_diff_added() ~= nil
+end
+
+function has_diff_removed()
+  return git.git_diff_removed() ~= nil
+end
+
+function has_diff_changed()
+  return git.git_diff_changed() ~= nil
+end
+
 -- get git info
 function get_git_diff_added()
   local diff_added = git.git_diff_added()
-  local diff = ''
+  local diff = ' '
   if tonumber(diff_added) ~= nil and tonumber(diff_added) > 0 then
-    diff = diff .. '  ' .. diff_added .. ' '
+    diff = diff .. ' ' .. diff_added .. ' '
   end
   return diff
 end
 
 function get_git_diff_removed()
   local diff_removed = git.git_diff_removed()
-  local diff = ''
+  local diff = ' '
   if tonumber(diff_removed) ~= nil and tonumber(diff_removed) > 0 then
-    diff = diff .. '  ' .. diff_removed
+    diff = diff .. ' ' .. diff_removed
   end
   return diff
 end
 
 function get_git_diff_changed()
   local diff_changed = git.git_diff_changed()
-  local diff = ''
+  local diff = ' '
   if tonumber(diff_changed) ~= nil and tonumber(diff_changed) > 0 then
-    diff = diff .. '  ' .. diff_changed .. ' '
+    diff = diff .. ' ' .. diff_changed .. ' '
   end
   return diff
 end
@@ -508,7 +558,7 @@ register_component(L, {
 -- insert the filename component after the mode component
 register_component(L, {
   name = 'filename',
-  provider = provide_filename,
+  provider = 'file_info',
   left_sep = 'left_rounded',
   right_sep = ' ',
   hl = function()
@@ -637,7 +687,7 @@ register_component(R, {
   left_sep = '',
   hl = function()
     return {
-      bg = get_temperature_color(weather_data.main.temp),
+      bg = get_temperature_color(WEATHER_DATA.main.temp),
       fg = 'white',
     }
   end,

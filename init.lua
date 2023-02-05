@@ -3,7 +3,7 @@ local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.n
 plugin_config = require('plugin_config')
 
 load_config = function()
-  require('nvim-weather')
+  require('nvim_meteostronomy')
   require('packer_mod')
   require('plugins')
   require('options')

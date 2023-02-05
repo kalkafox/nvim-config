@@ -1,6 +1,7 @@
 local is_windows = vim.loop.os_uname().sysname:find('Windows') ~= nil
 
 vim.o.termguicolors = true
+vim.o.showtabline = 2
 
 require('packer').startup(function(use)
   -- Package manager
@@ -33,6 +34,15 @@ require('packer').startup(function(use)
     end,
   })
 
+  -- Toggleterm (terminal)
+  use('akinsho/toggleterm.nvim')
+
+  -- Illuminate (highlight all instances of the word under the cursor)
+  use('RRethy/vim-illuminate')
+
+  -- nvim-notify (notifications)
+  use('rcarriga/nvim-notify')
+
   use('norcalli/nvim-colorizer.lua')
 
   use({ -- Additional text objects via treesitter
@@ -47,6 +57,9 @@ require('packer').startup(function(use)
 
   -- nvim projectconfig
   use('kalkafox/nvim-projectconfig')
+
+  -- schemastore (json schemas)
+  use('b0o/schemastore.nvim')
 
   -- emmet
   use({
@@ -102,7 +115,13 @@ require('packer').startup(function(use)
   -- Fuzzy Finder (files, lsp, etc)
   --use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
 
-  use({ 'kalkafox/telescope.nvim', branch = 'fix-preview-buffer-error', requires = { 'nvim-lua/plenary.nvim' } })
+  use({ 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } })
+
+  -- minimap.vim (minimap)
+  use({
+    'wfxr/minimap.vim',
+    run = 'cargo install --locked code-minimap',
+  })
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
   --use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make', cond = vim.fn.executable 'make' == 1 }
