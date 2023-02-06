@@ -223,7 +223,7 @@ end
 --
 
 --- get the current buffer's file name, defaults to '[no name]'
-function get_filename()
+local function get_filename()
   local filename = vim.api.nvim_buf_get_name(0)
   if filename == '' then
     filename = '[﬘]'
@@ -235,7 +235,7 @@ function get_filename()
 end
 
 --- get the current buffer's file type, defaults to '[not type]'
-function get_filetype()
+local function get_filetype()
   local filetype = vim.bo.filetype
   if filetype == '' then
     filetype = '[no type]'
@@ -244,19 +244,19 @@ function get_filetype()
 end
 
 --- get the cursor's line
-function get_line_cursor()
+local function get_line_cursor()
   local cursor_line = vim.fn.line('.')
   return cursor_line
 end
 
 -- get the cursor's column
-function get_column_cursor()
+local function get_column_cursor()
   local cursor_column = vim.fn.col('.')
   return cursor_column
 end
 
 --- get the file's total number of lines
-function get_line_total()
+local function get_line_total()
   return vim.api.nvim_buf_line_count(0)
 end
 
@@ -324,7 +324,7 @@ function get_weather()
 
   local icon = convert_string_to_unicode(weather.weather[1].icon)
 
-  if icon:sub(1, 2) == '01' and not is_daytime() and tonumber(WEATHER_DATA.moon_phase) then
+  if weather.weather[1].icon:sub(1, 2) == '01' and not is_daytime() and tonumber(WEATHER_DATA.moon_phase) then
     local moon_phase = tonumber(WEATHER_DATA.moon_phase)
     -- range is 0 to 29.5
     if moon_phase == 0 then
@@ -351,20 +351,20 @@ function get_weather()
   return icon .. '  ' .. temp .. '°F '
 end
 
-function has_diff_added()
+local function has_diff_added()
   return git.git_diff_added() ~= nil
 end
 
-function has_diff_removed()
+local function has_diff_removed()
   return git.git_diff_removed() ~= nil
 end
 
-function has_diff_changed()
+local function has_diff_changed()
   return git.git_diff_changed() ~= nil
 end
 
 -- get git info
-function get_git_diff_added()
+local function get_git_diff_added()
   local diff_added = git.git_diff_added()
   local diff = ' '
   if tonumber(diff_added) ~= nil and tonumber(diff_added) > 0 then
@@ -373,7 +373,7 @@ function get_git_diff_added()
   return diff
 end
 
-function get_git_diff_removed()
+local function get_git_diff_removed()
   local diff_removed = git.git_diff_removed()
   local diff = ' '
   if tonumber(diff_removed) ~= nil and tonumber(diff_removed) > 0 then
@@ -382,7 +382,7 @@ function get_git_diff_removed()
   return diff
 end
 
-function get_git_diff_changed()
+local function get_git_diff_changed()
   local diff_changed = git.git_diff_changed()
   local diff = ' '
   if tonumber(diff_changed) ~= nil and tonumber(diff_changed) > 0 then
@@ -391,7 +391,7 @@ function get_git_diff_changed()
   return diff
 end
 
-function get_git_branch()
+local function get_git_branch()
   -- info is in the local git variable
   -- git_branch function: 0x028e9e353268 git_info_exists function: 0x028e9e352e90 git_diff_added function: 0x028e9e2f1ce0 git_diff_removed function: 0x028e9e3041c0 git_diff_changed function: 0x028e9e210960
   if git.git_info_exists() == 0 then
@@ -403,7 +403,7 @@ function get_git_branch()
   return branch ~= '' and '' .. branch .. ' ' or ''
 end
 
-function get_os()
+local function get_os()
   -- add support for macos, linux and windows
   local os = vim.loop.os_uname().sysname:lower()
   if os:find('darwin') then
@@ -418,20 +418,20 @@ function get_os()
 end
 
 --- wrap a string with whitespaces
-function wrap(string)
+local function wrap(string)
   return ' ' .. string .. ' '
 end
 
 --- wrap a string with whitespaces and add a '' on the left,
 -- use on left section components for a nice  transition
-function wrap_left(string)
+local function wrap_left(string)
   --return ' ' .. string .. ' '
   return ' ' .. string .. ' '
 end
 
 --- wrap a string with whitespaces and add a '' on the right,
 -- use on left section components for a nice  transition
-function wrap_right(string)
+local function wrap_right(string)
   --return ' ' .. string .. ' '
   return ' ' .. string .. ' '
 end
@@ -439,7 +439,7 @@ end
 --- decorate a provider with a wrapper function
 -- the provider must conform to signature: (component, opts) -> string
 -- the wrapper must conform to the signature: (string) -> string
-function wrapped_provider(provider, wrapper)
+local function wrapped_provider(provider, wrapper)
   return function(component, opts)
     return wrapper(provider(component, opts))
   end
@@ -450,62 +450,62 @@ end
 --
 
 --- provide the vim mode (NOMRAL, INSERT, etc.)
-function provide_mode(component, opts)
+local function provide_mode(component, opts)
   return vi_mode.get_vim_mode()
 end
 
 --- provide the buffer's file name
-function provide_filename(component, opts)
+local function provide_filename(component, opts)
   return get_filename()
 end
 
 --- provide the line's information (curosor position and file's total lines)
-function provide_linenumber(component, opts)
+local function provide_linenumber(component, opts)
   return get_line_cursor() .. '/' .. get_line_total()
 end
 
 -- provide the column's information (cursor position)
-function provide_column(component, opts)
+local function provide_column(component, opts)
   return get_column_cursor()
 end
 
-function provide_linenumber_and_column(component, opts)
+local function provide_linenumber_and_column(component, opts)
   return get_line_cursor() .. ':' .. get_column_cursor()
 end
 
 -- provide the buffer's file type
-function provide_filetype(component, opts)
+local function provide_filetype(component, opts)
   return get_filetype()
 end
 
 -- provide the paw
-function provide_paw(component, opts)
+local function provide_paw(component, opts)
   return ' '
 end
 
 -- provide weather
-function provide_weather(component, opts)
+local function provide_weather(component, opts)
   return get_weather()
 end
 
 -- provide git branch
-function provide_git_added(component, opts)
+local function provide_git_added(component, opts)
   return get_git_diff_added()
 end
 
-function provide_git_changed(component, opts)
+local function provide_git_changed(component, opts)
   return get_git_diff_changed()
 end
 
-function provide_git_removed(component, opts)
+local function provide_git_removed(component, opts)
   return get_git_diff_removed()
 end
 
-function provide_git_branch(component, opts)
+local function provide_git_branch(component, opts)
   return get_git_branch()
 end
 
-function provide_operating_system(component, opts)
+local function provide_operating_system(component, opts)
   return get_os()
 end
 

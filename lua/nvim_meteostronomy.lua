@@ -1,6 +1,8 @@
 -- Get nvim-data directory
 local data_dir = vim.fn.stdpath('data')
 
+-- moon phase algorithm was implemented from http://www.voidware.com/moon_phase.htm
+-- and modified to work with Lua
 local function get_moon_phase()
   local date = os.date('*t')
   local year = date.year
