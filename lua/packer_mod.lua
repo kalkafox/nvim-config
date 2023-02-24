@@ -123,6 +123,9 @@ require('packer').startup(function(use)
     run = 'cargo install --locked code-minimap',
   })
 
+  -- inlay-hints.nvim (inlay hints)
+  use('simrat39/inlay-hints.nvim')
+
   -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
   --use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make', cond = vim.fn.executable 'make' == 1 }
 

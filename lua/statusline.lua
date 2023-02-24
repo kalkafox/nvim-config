@@ -299,7 +299,7 @@ local function convert_string_to_unicode(str)
 end
 
 local function get_temperature_color(temp)
-  local temp = tonumber(temp)
+  temp = tonumber(temp)
   if temp < 50 then
     return darken(T.cyan, 20)
   elseif temp < 60 then
@@ -316,39 +316,40 @@ local function get_temperature_color(temp)
 end
 
 -- get weather info (is localized in WEATHER_DATA global)
-function get_weather()
+local function get_weather()
   local weather = WEATHER_DATA
   if weather == nil then
     return ''
   end
 
   local icon = convert_string_to_unicode(weather.weather[1].icon)
+  local moon_icon
 
-  if weather.weather[1].icon:sub(1, 2) == '01' and not is_daytime() and tonumber(WEATHER_DATA.moon_phase) then
+  if tonumber(WEATHER_DATA.moon_phase) then
     local moon_phase = tonumber(WEATHER_DATA.moon_phase)
     -- range is 0 to 29.5
     if moon_phase == 0 then
-      icon = '󰽤'
+      moon_icon = '󰽤'
     elseif moon_phase == 1 then
-      icon = '󰽥'
+      moon_icon = '󰽥'
     elseif moon_phase == 2 then
-      icon = ''
+      moon_icon = ''
     elseif moon_phase == 3 then
-      icon = '󰽦'
+      moon_icon = '󰽦'
     elseif moon_phase == 4 then
-      icon = '󰽢'
+      moon_icon = '󰽢'
     elseif moon_phase == 5 then
-      icon = '󰽨'
+      moon_icon = '󰽨'
     elseif moon_phase == 6 then
-      icon = '󰽧'
+      moon_icon = '󰽧'
     elseif moon_phase == 7 then
-      icon = ''
+      moon_icon = ''
     end
   end
 
   local temp = weather.main.temp
 
-  return icon .. '  ' .. temp .. '°F '
+  return moon_icon .. ' ' .. icon .. '  ' .. temp .. '°F '
 end
 
 local function has_diff_added()

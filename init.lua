@@ -1,8 +1,8 @@
 local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 
-plugin_config = require('plugin_config')
+PLUGIN_CONFIG = require('plugin_config')
 
-load_config = function()
+function LOAD_CONFIG()
   require('nvim_meteostronomy')
   require('packer_mod')
   require('plugins')
@@ -22,8 +22,8 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   vim.cmd([[packadd packer.nvim]])
   require('packer_mod')
   require('packer').sync()
-  vim.cmd([[autocmd User PackerComplete ++once echo ' Let the magic begin.' | lua load_config()]])
+  vim.cmd([[autocmd User PackerComplete ++once echo ' Let the magic begin.' | lua LOAD_CONFIG()]])
   return
 end
 
-load_config()
+LOAD_CONFIG()

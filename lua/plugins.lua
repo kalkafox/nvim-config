@@ -99,9 +99,13 @@ require('nvim-treesitter.configs').setup({
   },
 })
 
+require('inlay-hints').setup()
+
+local ih = require('inlay-hints')
+
 -- LSP settings.
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
+local on_attach = function(c, bufnr)
   -- NOTE: Remember that lua is a real programming language, and as such it is possible
   -- to define small helper and utility functions so you don't have to repeat yourself
   -- many times.
@@ -115,6 +119,9 @@ local on_attach = function(_, bufnr)
 
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
+
+  -- Attach inlay-hints
+  ih.on_attach(c, bufnr)
 
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
@@ -168,6 +175,16 @@ local servers = {
   -- rust_analyzer = {},
   -- tsserver = {},
 
+  lua = {
+    settings = {
+      Lua = {
+        hint = {
+          enable = true,
+        },
+      },
+    },
+  },
+
   denols = {
     settings = {
       deno = {
@@ -185,10 +202,28 @@ local servers = {
         preferences = {
           quoteStyle = 'single',
         },
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = 'all', -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = true,
+        },
       },
       typescript = {
         preferences = {
           quoteStyle = 'single',
+        },
+        inlayHints = {
+          includeInlayEnumMemberValueHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayParameterNameHints = 'all', -- 'none' | 'literals' | 'all';
+          includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayVariableTypeHints = true,
         },
       },
     },

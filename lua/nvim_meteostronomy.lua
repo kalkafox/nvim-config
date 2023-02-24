@@ -34,14 +34,17 @@ end
 
 -- Perform a GET request to the OpenWeatherMap API
 local function get_weather()
-  local api_key = plugin_config['nvim_meteostronomy']['api_key']
-  local zip_code = plugin_config['nvim_meteostronomy']['zip_code']
+  local api_key = PLUGIN_CONFIG['nvim_meteostronomy']['api_key']
+  local zip_code = PLUGIN_CONFIG['nvim_meteostronomy']['zip_code']
   local url = 'https://api.openweathermap.org/data/2.5/weather?zip='
     .. zip_code
     .. '&appid='
     .. api_key
     .. '&units=imperial'
   local handle = io.popen('curl -s "' .. url .. '"')
+  if handle == nil then
+    return 'Weather API error'
+  end
   local result = handle:read('*a')
   handle:close()
   return result
@@ -51,28 +54,42 @@ end
 local function parse_weather()
   -- Check if the weather data is less than 10 minutes old, if so, return it
   local weather_timestamp_file = io.open(data_dir .. '/weather_timestamp', 'r')
-  if weather_timestamp_file ~= nil then
-    local weather_timestamp = weather_timestamp_file:read('*all')
-    weather_timestamp_file:close()
-    if os.time() - weather_timestamp < 600 then
-      local weather_file = io.open(data_dir .. '/weather.json', 'r')
-      local weather = weather_file:read('*all')
-      weather_file:close()
-      local weather_table = vim.fn.json_decode(weather)
-      return weather_table
+  if weather_timestamp_file == nil then
+    return 'Weather API error: Could not read from file "weather_timestamp"'
+  end
+  local weather_timestamp = weather_timestamp_file:read('*all')
+  weather_timestamp_file:close()
+  if os.time() - weather_timestamp < 600 then
+    local weather_file = io.open(data_dir .. '/weather.json', 'r')
+    if weather_file == nil then
+      return 'Weather API error: Could not read from file "weather.json"'
     end
+    local weather = weather_file:read('*all')
+    weather_file:close()
+    if weather == 'Weather API error' then
+      return 'Weather API error: Could not read from file "weather.json"'
+    end
+    local weather_table = vim.fn.json_decode(weather)
+    return weather_table
   end
   local weather = get_weather()
   local weather_table = vim.fn.json_decode(weather)
   if weather_table['cod'] ~= 200 then
     return 'Weather API error: ' .. weather_table['message']
   end
-  local weather_timestamp = os.time()
+  weather_timestamp = os.time()
+  local retries, max_retries = 0, 5
   weather_timestamp_file = io.open(data_dir .. '/weather_timestamp', 'w')
+  if weather_timestamp_file == nil then
+    return 'Weather API error: Could not write to file "weather_timestamp"'
+  end
   weather_timestamp_file:write(weather_timestamp)
   weather_timestamp_file:close()
   -- Save data to a file
   local weather_file = io.open(data_dir .. '/weather.json', 'w')
+  if weather_file == nil then
+    return 'Weather API error: Could not write to file "weather.json"'
+  end
   weather_file:write(weather)
   weather_file:close()
   return weather_table
