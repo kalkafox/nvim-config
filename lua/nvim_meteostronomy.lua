@@ -81,7 +81,6 @@ local function parse_weather()
     if weather_timestamp_file == nil then
       return 'Weather API error: There was an error creating "weather_timestamp"'
     end
-    weather_timestamp_file:close()
   end
   local weather_timestamp = weather_timestamp_file:read('*all')
   weather_timestamp_file:close()
@@ -97,16 +96,19 @@ local function parse_weather()
       if weather_file == nil then
         return 'Weather API error: There was an error creating "weather.json"'
       end
-      weather_file:close()
     end
     local weather = weather_file:read('*all')
     weather_file:close()
+    if weather == '' then
+      goto continue
+    end
     if weather == 'Weather API error' then
       return 'Weather API error: Could not read from file "weather.json"'
     end
     local weather_table = vim.fn.json_decode(weather)
     return weather_table
   end
+  ::continue::
   local weather = get_weather()
   local weather_table = vim.fn.json_decode(weather)
   if weather_table['cod'] ~= 200 then
