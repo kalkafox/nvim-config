@@ -76,18 +76,12 @@ local function parse_weather()
   -- Check if the weather data is less than 10 minutes old, if so, return it
   local weather_timestamp_file = io.open(data_dir .. '/weather_timestamp', 'r')
   if weather_timestamp_file == nil then
-    -- Touch the file
-    weather_timestamp_file = io.open(data_dir .. '/weather_timestamp', 'w')
-    if weather_timestamp_file == nil then
-      return 'Weather API error: There was an error creating "weather_timestamp"'
-    end
+    goto continue
   end
   local weather_timestamp = weather_timestamp_file:read('*all')
   weather_timestamp_file:close()
   if weather_timestamp == '' then
-    weather_timestamp = 0
-  else
-    weather_timestamp = tonumber(weather_timestamp)
+    goto continue
   end
   if os.time() - weather_timestamp < 600 then
     local weather_file = io.open(data_dir .. '/weather.json', 'r')
