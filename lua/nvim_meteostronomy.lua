@@ -97,4 +97,7 @@ end
 
 WEATHER_DATA = parse_weather()
 
-WEATHER_DATA.moon_phase = get_moon_phase()
+if type(WEATHER_DATA) == 'string' then
+  error(WEATHER_DATA)
+  return
+end
