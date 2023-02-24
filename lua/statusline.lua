@@ -315,49 +315,21 @@ local function get_temperature_color(temp)
   end
 end
 
-local function get_moon_icon(moon_phase)
-  -- range is 0 to 29.5
-  if moon_phase == 0 then
-    return '󰽤'
-  elseif moon_phase == 1 then
-    return '󰽥'
-  elseif moon_phase == 2 then
-    return ''
-  elseif moon_phase == 3 then
-    return '󰽦'
-  elseif moon_phase == 4 then
-    return '󰽢'
-  elseif moon_phase == 5 then
-    return '󰽨'
-  elseif moon_phase == 6 then
-    return '󰽧'
-  elseif moon_phase == 7 then
-    return ''
-  end
-end
-
 -- get weather info (is localized in WEATHER_DATA global)
 local function get_weather()
   local suffix = '°F '
   local weather = WEATHER_DATA
 
   if type(weather) == 'string' then
-    local icon = get_moon_icon(tonumber(WEATHER_DATA.moon_phase))
+    local icon = WEATHER_DATA.moon_icon
     return icon .. '  ' .. '??.??' .. suffix
   end
 
   local icon = convert_string_to_unicode(weather.weather[1].icon)
-  local moon_icon
-
-  if tonumber(WEATHER_DATA.moon_phase) then
-    local moon_phase = tonumber(WEATHER_DATA.moon_phase)
-    -- range is 0 to 29.5
-    moon_icon = get_moon_icon(moon_phase)
-  end
 
   local temp = weather.main.temp
 
-  return moon_icon .. ' ' .. icon .. '  ' .. temp .. '°F '
+  return WEATHER_DATA.moon_icon .. ' ' .. icon .. '  ' .. temp .. suffix
 end
 
 local function has_diff_added()

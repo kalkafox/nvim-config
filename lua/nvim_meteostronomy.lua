@@ -32,6 +32,27 @@ local function get_moon_phase()
   return b
 end
 
+local function get_moon_icon(moon_phase)
+  -- range is 0 to 29.5
+  if moon_phase == 0 then
+    return '󰽤'
+  elseif moon_phase == 1 then
+    return '󰽥'
+  elseif moon_phase == 2 then
+    return ''
+  elseif moon_phase == 3 then
+    return '󰽦'
+  elseif moon_phase == 4 then
+    return '󰽢'
+  elseif moon_phase == 5 then
+    return '󰽨'
+  elseif moon_phase == 6 then
+    return '󰽧'
+  elseif moon_phase == 7 then
+    return ''
+  end
+end
+
 -- Perform a GET request to the OpenWeatherMap API
 local function get_weather()
   local api_key = PLUGIN_CONFIG['nvim_meteostronomy']['api_key']
@@ -55,14 +76,28 @@ local function parse_weather()
   -- Check if the weather data is less than 10 minutes old, if so, return it
   local weather_timestamp_file = io.open(data_dir .. '/weather_timestamp', 'r')
   if weather_timestamp_file == nil then
-    return 'Weather API error: Could not read from file "weather_timestamp"'
+    -- Touch the file
+    weather_timestamp_file = io.open(data_dir .. '/weather_timestamp', 'w')
+    if weather_timestamp_file == nil then
+      return 'Weather API error: There was an error creating "weather_timestamp"'
+    end
+    weather_timestamp_file:close()
   end
   local weather_timestamp = weather_timestamp_file:read('*all')
   weather_timestamp_file:close()
+  if weather_timestamp == '' then
+    weather_timestamp = 0
+  else
+    weather_timestamp = tonumber(weather_timestamp)
+  end
   if os.time() - weather_timestamp < 600 then
     local weather_file = io.open(data_dir .. '/weather.json', 'r')
     if weather_file == nil then
-      return 'Weather API error: Could not read from file "weather.json"'
+      weather_file = io.open(data_dir .. '/weather.json', 'w')
+      if weather_file == nil then
+        return 'Weather API error: There was an error creating "weather.json"'
+      end
+      weather_file:close()
     end
     local weather = weather_file:read('*all')
     weather_file:close()
@@ -101,3 +136,6 @@ if type(WEATHER_DATA) == 'string' then
   error(WEATHER_DATA)
   return
 end
+
+WEATHER_DATA.moon_phase = get_moon_phase()
+WEATHER_DATA.moon_icon = get_moon_icon(WEATHER_DATA.moon_phase)
