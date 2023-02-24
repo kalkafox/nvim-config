@@ -73,12 +73,13 @@ end
 
 -- Parse the JSON response from the OpenWeatherMap API
 local function parse_weather()
+  local weather_timestamp
   -- Check if the weather data is less than 10 minutes old, if so, return it
   local weather_timestamp_file = io.open(data_dir .. '/weather_timestamp', 'r')
   if weather_timestamp_file == nil then
     goto continue
   end
-  local weather_timestamp = weather_timestamp_file:read('*all')
+  weather_timestamp = weather_timestamp_file:read('*all')
   weather_timestamp_file:close()
   if weather_timestamp == '' then
     goto continue
