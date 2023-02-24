@@ -315,11 +315,35 @@ local function get_temperature_color(temp)
   end
 end
 
+local function get_moon_icon(moon_phase)
+  -- range is 0 to 29.5
+  if moon_phase == 0 then
+    return '󰽤'
+  elseif moon_phase == 1 then
+    return '󰽥'
+  elseif moon_phase == 2 then
+    return ''
+  elseif moon_phase == 3 then
+    return '󰽦'
+  elseif moon_phase == 4 then
+    return '󰽢'
+  elseif moon_phase == 5 then
+    return '󰽨'
+  elseif moon_phase == 6 then
+    return '󰽧'
+  elseif moon_phase == 7 then
+    return ''
+  end
+end
+
 -- get weather info (is localized in WEATHER_DATA global)
 local function get_weather()
+  local suffix = '°F '
   local weather = WEATHER_DATA
-  if weather == nil then
-    return ''
+
+  if type(weather) == 'string' then
+    local icon = get_moon_icon(tonumber(WEATHER_DATA.moon_phase))
+    return icon .. '  ' .. '??.??' .. suffix
   end
 
   local icon = convert_string_to_unicode(weather.weather[1].icon)
@@ -328,23 +352,7 @@ local function get_weather()
   if tonumber(WEATHER_DATA.moon_phase) then
     local moon_phase = tonumber(WEATHER_DATA.moon_phase)
     -- range is 0 to 29.5
-    if moon_phase == 0 then
-      moon_icon = '󰽤'
-    elseif moon_phase == 1 then
-      moon_icon = '󰽥'
-    elseif moon_phase == 2 then
-      moon_icon = ''
-    elseif moon_phase == 3 then
-      moon_icon = '󰽦'
-    elseif moon_phase == 4 then
-      moon_icon = '󰽢'
-    elseif moon_phase == 5 then
-      moon_icon = '󰽨'
-    elseif moon_phase == 6 then
-      moon_icon = '󰽧'
-    elseif moon_phase == 7 then
-      moon_icon = ''
-    end
+    moon_icon = get_moon_icon(moon_phase)
   end
 
   local temp = weather.main.temp
@@ -688,7 +696,8 @@ register_component(R, {
   left_sep = '',
   hl = function()
     return {
-      bg = get_temperature_color(WEATHER_DATA.main.temp),
+      bg = type(WEATHER_DATA) == 'table' and get_temperature_color(WEATHER_DATA.main.temp)
+        or darken(T[vi_mode.get_mode_color()], 60),
       fg = 'white',
     }
   end,
